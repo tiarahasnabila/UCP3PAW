@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Pelanggan - Toko Bunga Kami</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Toko Bunga Kami - Halaman Pelanggan</h1>
+
+    <!-- Bagian Pesanan Pelanggan -->
+    <h2>Pesanan Saya</h2>
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#orderModal">Tambah Pesanan</button>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID Pesanan</th>
+                <th>Nama Paket</th>
+                <th>Jumlah</th>
+                <th>Total Harga</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="orderList">
+            <!-- Data pesanan akan ditampilkan di sini -->
+        </tbody>
+    </table>
+
+    <!-- Bagian Stok Produk -->
+    <h2>Stok Produk</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nama Paket</th>
+                <th>Stok</th>
+                <th>Harga</th>
+            </tr>
+        </thead>
+        <tbody id="productStockList">
+            <!-- Data stok produk akan ditampilkan di sini -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal untuk Menambah Pesanan -->
+<div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderModalLabel">Tambah Pesanan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addOrderForm">
+                    <div class="mb-3">
+                        <label for="orderProductName" class="form-label">Nama Paket</label>
+                        <select class="form-select" id="orderProductName" required>
+                            <!-- Option produk akan dimuat di sini -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orderQuantity" class="form-label">Jumlah</label>
+                        <input type="number" class="form-control" id="orderQuantity" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Pesan Sekarang</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+$(document).ready(function () {
+    // Memuat data produk dari server
+    function loadProductStock() {
+        $.get('/api/products', function (products) {
+            const productStockList = $('#productStockList');
+            productStockList.html('');
+            products.forEach(product => {
+                const row = `<tr>
+                    <td>${product.nama_paket}</td>
+                    <td>${product.stok}</td>
+                    <td>Rp. ${product.harga}</td>
+                </tr>`;
+                productStockList.append(row);
+            });
+        }).fail(function () {
+            alert('Gagal memuat data produk');
+        });
+    }
+    // Memuat data pesanan dari server
+    function loadOrders() {
+        $.get('/api/orders', function (orders) {
+            const orderList = $('#orderList');
+            orderList.html('');
+            orders.forEach(order => {
+                const row = `<tr>
+                    <td>${order.id}</td>
+                    <td>${order.nama_paket}</td>
+                    <td>${order.jumlah}</td>
+                    <td>Rp. ${order.total_harga}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="editOrder(${order.id})">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteOrder(${order.id})">Hapus</button>
+                    </td>
+                </tr>`;
+                orderList.append(row);
+            });
+        }).fail(function () {
+            alert('Gagal memuat data pesanan');
+        });
+    }
+
+    // Menambah pesanan baru
+    $('#addOrderForm').on('submit', function (e) {
+        e.preventDefault();
+        const productName = $('#orderProductName').val();
+        const quantity = $('#orderQuantity').val();
+
+        $.post('/api/orders', { nama_paket: productName, jumlah: quantity }, function () {
+            loadOrders();
+            $('#orderModal').modal('hide');
+        }).fail(function () {
+            alert('Gagal menambah pesanan');
+        });
+    });
+
+    // Memuat pilihan produk untuk pesanan
+    function loadProductOptions() {
+        $.get('/api/products', function (products) {
+            const productSelect = $('#orderProductName');
+            productSelect.html('');
+            products.forEach(product => {
+                productSelect.append(<option value="${product.nama_paket}">${product.nama_paket}</option>);
+            });
+        }).fail(function () {
+            alert('Gagal memuat pilihan produk');
+        });
+    }
+
+    // Memuat data saat halaman dimuat
+    loadProductStock();
+    loadOrders();
+    loadProductOptions();
+});
+</script>
+
+</body>
+</html>

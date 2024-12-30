@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+<div class="body">
+    <div class="login-container">
+        <div class="login-box">
+            <img src="https://st.depositphotos.com/18879306/60933/v/450/depositphotos_609336790-stock-illustration-initials-letter-wedding-monogram-logos.jpg" alt="Logo" class="logo" />
+            <h2>Sign In</h2>
+            <p>Silahkan Masukkan Akun Anda</p>
+            <form action="/login" method="POST" class="login-form">
+                <input type="text" name="username" placeholder="Username" required />
+                <input type="password" name="password" placeholder="Password" required />
+                <button type="submit" class="btn btn-primary mt-3">Sign in</button>
+            </form>
+            <p class="footer-text mt-3">Belum Memiliki Akun ? <a href="/signup">Sign Up</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
